@@ -5,8 +5,10 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { LanguageProvider } from '@/hooks/use-language';
+import NextAuthSessionProvider from '@/components/session-provider';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -191,14 +193,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           defaultTheme='light'
           enableSystem
           disableTransitionOnChange>
-          <LanguageProvider>
-            <div className='min-h-screen flex flex-col'>
-              <Header />
-              <main className='flex-1'>{children}</main>
-              <Footer />
-            </div>
-            <Toaster />
-          </LanguageProvider>
+          {/* Wrap client-side session provider so client components can use `useSession` */}
+          <NextAuthSessionProvider>
+            <LanguageProvider>
+              <div className='min-h-screen flex flex-col'>
+                <Header />
+                <main className='flex-1'>{children}</main>
+                <Footer />
+              </div>
+              <Toaster />
+            </LanguageProvider>
+          </NextAuthSessionProvider>
         </ThemeProvider>
       </body>
     </html>
