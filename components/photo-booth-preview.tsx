@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 
 interface PhotoBoothPreviewProps {
   template?: 'classic' | 'triple' | 'grid2x2' | 'grid2x3' | 'single';
@@ -28,9 +29,11 @@ export default function PhotoBoothPreview({
               <div className="flex flex-col gap-2 aspect-[1/3]">
                 {dummyPhotos.slice(0, 4).map((photo, index) => (
                   <div key={index} className="flex-1 border-2 border-gray-700">
-                    <img
+                    <Image
                       src={photo}
                       alt={`Person ${index + 1}`}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -47,9 +50,11 @@ export default function PhotoBoothPreview({
               <div className="flex flex-col gap-2 aspect-[1/2.25]">
                 {dummyPhotos.slice(0, 3).map((photo, index) => (
                   <div key={index} className="flex-1 border-2 border-gray-700">
-                    <img
+                    <Image
                       src={photo}
                       alt={`Person ${index + 1}`}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -66,9 +71,11 @@ export default function PhotoBoothPreview({
               <div className="grid grid-cols-2 gap-2 aspect-square">
                 {dummyPhotos.slice(0, 4).map((photo, index) => (
                   <div key={index} className="border-2 border-gray-700 aspect-square">
-                    <img
+                    <Image
                       src={photo}
                       alt={`Person ${index + 1}`}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -85,9 +92,11 @@ export default function PhotoBoothPreview({
               <div className="grid grid-cols-2 gap-2 aspect-[2/3]">
                 {dummyPhotos.slice(0, 6).map((photo, index) => (
                   <div key={index} className="border-2 border-gray-700 aspect-square">
-                    <img
+                    <Image
                       src={photo}
                       alt={`Person ${index + 1}`}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -101,10 +110,12 @@ export default function PhotoBoothPreview({
         return (
           <div className="bg-white p-4 shadow-lg rounded-md max-w-sm mx-auto">
             <div className="border-4 border-black p-2 bg-white">
-              <div className="border-2 border-gray-700 aspect-[4/6]">
-                <img
+              <div className="aspect-[2/3]">
+                <Image
                   src={dummyPhotos[0]}
                   alt="Single person"
+                  width={400}
+                  height={600}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -171,18 +182,33 @@ export function PhotoBoothShowcase() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#ffffff] via-[#C8D1D2] to-[#4A8EDC] py-12 flex flex-col items-center">
+      <div className="container mx-auto px-4 flex flex-col items-center">
+        
+        {/* 🖼️ Logo di atas */}
+        <div className="mb-2 sm:mb-2">
+          <Image
+            src="/Asset 240.png"
+            alt="Memories End Logo"
+            width={320}
+            height={320}
+            className="object-contain drop-shadow-xl mx-auto"
+            priority
+          />
+        </div>
+
+        {/* 📝 Judul & Deskripsi */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            📸 Photo Booth Templates
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-[#0F3C68] via-[#4A8EDC] to-[#8ebff8] bg-clip-text text-transparent">
+            Photo Booth Templates
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-[#003468]/80 max-w-2xl mx-auto text-base sm:text-lg">
             Professional photo booth layouts with real people. Perfect for events, 
             parties, and creating lasting memories with friends and family.
           </p>
         </div>
 
+        {/* 📸 Daftar Template */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {templates.map((template) => (
             <div key={template.id} className="transform hover:scale-105 transition-transform duration-200">
@@ -191,12 +217,13 @@ export function PhotoBoothShowcase() {
           ))}
         </div>
 
+        {/* ✨ Highlight Fitur */}
         <div className="text-center mt-12">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-xl p-6 max-w-md mx-auto border border-[#4A8EDC]/20">
+            <h3 className="text-xl font-semibold text-[#0F3C68] mb-3">
               ✨ Features Highlights
             </h3>
-            <ul className="text-left text-gray-600 space-y-1">
+            <ul className="text-left text-[#003468]/80 space-y-1">
               <li>• Real-time camera capture</li>
               <li>• Custom stickers and backgrounds</li>
               <li>• Multiple photo layouts</li>

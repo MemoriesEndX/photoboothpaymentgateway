@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     // Get environment variables
     const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
-    const supportEmail = process.env.SUPPORT_EMAIL ?? 'gmail@tedyfazrin.com';
+    const supportEmail = process.env.SUPPORT_EMAIL ?? 'memoriesendx@gmail.com';
 
     if (!accessKey) {
       return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
