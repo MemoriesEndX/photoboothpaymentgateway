@@ -1,7 +1,11 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useLanguage } from '@/hooks/use-language';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import html2canvas from 'html2canvas';
 
 interface PhotoStripProps {
   readonly photos: readonly string[];
@@ -13,6 +17,85 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
   const stripRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Function to save strip to gallery
+  const handleSaveToGallery = useCallback(async () => {
+    if (!stripRef.current || isSaving) return;
+
+    try {
+      setIsSaving(true);
+
+      // Get sessionId from localStorage
+      const sessionId = localStorage.getItem('sessionId');
+      if (!sessionId) {
+        toast({
+          title: '⚠️ Session tidak ditemukan',
+          description: 'Silakan mulai sesi baru terlebih dahulu.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: '📸 Menyimpan...',
+        description: 'Sedang mengambil gambar strip...',
+        duration: 2000,
+      });
+
+      // Capture the strip using html2canvas
+      const canvas = await html2canvas(stripRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2, // Higher quality
+        logging: false,
+        useCORS: true,
+      });
+
+      // Convert to base64
+      const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+      console.log('📸 Strip captured, sending to API...');
+
+      // Send to API
+      const response = await fetch('/api/save-strip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photo: base64Image,
+          sessionId,
+          template: selectedTemplate,
+          userId: null,
+          metadata: {
+            photoCount: photos.length,
+            templateUsed: selectedTemplate,
+            captureTime: new Date().toISOString(),
+          },
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast({
+          title: '✅ Berhasil!',
+          description: 'Strip photo telah disimpan ke galeri.',
+          duration: 3000,
+        });
+        console.log('✅ Strip saved:', result.filePath);
+      } else {
+        throw new Error(result.error || 'Failed to save strip');
+      }
+    } catch (error) {
+      console.error('❌ Error saving strip:', error);
+      toast({
+        title: '❌ Gagal Menyimpan',
+        description: error instanceof Error ? error.message : 'Terjadi kesalahan',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [isSaving, selectedTemplate, photos.length]);
 
   useEffect(() => {
     // Reset loading state when photos change
@@ -174,6 +257,29 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Save to Gallery Button - Only show when not loading */}
+      {!isLoading && photos.length > 0 && (
+        <div className='mt-6 flex justify-center'>
+          <Button
+            onClick={handleSaveToGallery}
+            disabled={isSaving}
+            className='bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg font-semibold rounded-xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'
+          >
+            {isSaving ? (
+              <>
+                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2'></div>
+                Menyimpan...
+              </>
+            ) : (
+              <>
+                <Download className='mr-2 h-5 w-5' />
+                Simpan ke Galeri
+              </>
+            )}
+          </Button>
         </div>
       )}
     </div>

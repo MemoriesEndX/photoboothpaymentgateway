@@ -9,6 +9,7 @@ import Cookies from "js-cookie";
 import { useState, useRef, useEffect } from "react";
 import { Settings, LogOut } from "lucide-react";
 
+
 export default function Header() {
   const { t } = useLanguage();
   const { data: session } = useSession();

@@ -14,16 +14,64 @@ model User {
   password  String    // ✅ Tambahkan ini
   role      Role      @default(GUEST)
   photos    Photo[]
+  singlePhotos SinglePhoto[] 
+  stripphotosoriginal StripPhotoOriginal[] 
   createdAt DateTime  @default(now())
 }
 
 model Photo {
+
   id        Int       @id @default(autoincrement())
   url       String
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id])
-  createdAt DateTime  @default(now())
+  userId    Int?
+  user      User?     @relation(fields: [userId], references: [id])
+ 
+  sessionId    String
+  storagePath  String   // URL hasil upload ke S3/GCS
+  filename     String
+  thumbnailPath String?
+  packageId    String?
+  paid         Boolean  @default(false)
+  amountPaid   Decimal? @db.Decimal(10,2)
+  metadata     Json?
+  queueNumber  Int      @default(0) // nomor antrian
+  createdAt    DateTime @default(now())
 }
+
+model SinglePhoto {
+  id             Int       @id @default(autoincrement())
+  url            String
+  userId         Int?
+  user           User?     @relation(fields: [userId], references: [id])
+  sessionId      String
+  storagePath    String    // URL hasil upload atau lokasi penyimpanan
+  filename       String
+  thumbnailPath  String?
+  packageId      String?
+  paid           Boolean   @default(false)
+  amountPaid     Decimal?  @db.Decimal(10,2)
+  metadata       Json?
+  queueNumber    Int       @default(0) // nomor antrian
+  createdAt      DateTime  @default(now())
+}
+
+model StripPhotoOriginal {
+  id             Int       @id @default(autoincrement())
+  url            String
+  userId         Int?
+  user           User?     @relation(fields: [userId], references: [id])
+  sessionId      String
+  storagePath    String    // URL hasil upload atau lokasi penyimpanan
+  filename       String
+  thumbnailPath  String?
+  packageId      String?
+  paid           Boolean   @default(false)
+  amountPaid     Decimal?  @db.Decimal(10,2)
+  metadata       Json?
+  queueNumber    Int       @default(0) // nomor antrian
+  createdAt      DateTime  @default(now())
+}
+
 
 enum Role {
   SUPERADMIN

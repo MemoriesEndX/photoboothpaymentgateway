@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { Toaster as SonnerToaster } from 'sonner';
 import { LanguageProvider } from '@/hooks/use-language';
 import NextAuthSessionProvider from '@/components/session-provider';
 import Header from '@/components/header';
@@ -202,6 +203,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <Footer />
               </div>
               <Toaster />
+              <SonnerToaster position="bottom-right" richColors />
             </LanguageProvider>
           </NextAuthSessionProvider>
         </ThemeProvider>

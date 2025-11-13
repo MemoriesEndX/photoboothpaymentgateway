@@ -1,16 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+
+  // ❌ eslint dan typescript tidak boleh lagi di sini
+  // ✅ tapi kamu bisa atur di file terpisah (.eslintrc.json, tsconfig.json)
+
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true, // Masih boleh di sini ✅
   },
+
   images: {
-    domains: ['placeholder.com'],
+    // ✅ gunakan remotePatterns alih-alih domains
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'placeholder.com',
+      },
+    ],
     unoptimized: true,
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

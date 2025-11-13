@@ -1,5 +1,23 @@
 # 📸 Advanced Photo Booth Web App
 
+
+versi lengkap dan konsisten dengan arsitektur, flowchart, database, dan API dari proyekmu sendiri, bukan dari repo asal tedy69/photobooth.
+
+Untuk konfirmasi sebelum aku tulis versi finalnya, aku mau pastikan beberapa hal dulu:
+
+🧩 Basis proyek:
+Apakah kamu ingin versi final ini tetap memakai Next.js (frontend) + API Routes bawaan Next.js (tanpa Laravel backend), atau tetap hybrid (Next.js  Prisma API) seperti blueprint sebelumnya?
+
+☁️ Storage:
+Masih ingin menggunakan S3/GCS untuk penyimpanan foto seperti blueprint kemarin?
+
+💳 Payment gateway:
+Gunakan Midtrans (untuk lokal) seperti blueprint kamu, atau cukup tulis generic payment integration (Stripe/Midtrans supported)?
+
+📧 Email form:
+Tetap menggunakan Web3Forms + SUPPORT_EMAIL seperti yang sudah kamu buat sebelumnya?
+
+
 A sophisticated, fully-featured photo booth web application with real-time camera capture, professional photo strips, advanced sticker system, custom backgrounds/frames, and comprehensive internationalization support.
 
 ## 📋 Table of Contents

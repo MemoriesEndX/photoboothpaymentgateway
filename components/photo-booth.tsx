@@ -11,44 +11,157 @@ import PhotoGallery from './photo-gallery';
 import TimerIndicator from './timer-indicator';
 import TemplateSelector from './template-selector';
 import PhotoStrip from './photo-strip';
+import QrGenerator from './QrGenerator';
 import { stickers } from '@/lib/frames';
 import { backgrounds } from '@/lib/backgrounds';
 import { toast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
 import { downloadImage } from '@/lib/composite-image-utils';
 import { createPhotoStrip } from '@/lib/photo-strip-utils';
+import { v4 as uuidv4 } from 'uuid';
 
 // Import our custom hooks
 import { useCamera } from '@/hooks/use-camera';
 import { useFabricStickers } from '@/hooks/use-fabric-stickers';
 import { usePhotoGallery } from '@/hooks/use-photo-gallery';
 import { templates } from '@/lib/templates';
+import { QrCode } from 'lucide-react';
+
+
+
 
 export default function PhotoBooth() {
   const { t } = useLanguage();
 
-  // UI State
+  // ========================================
+  // UI State Management
+  // ========================================
   const [activeTab, setActiveTab] = useState('camera');
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Photo strip state
+  // ========================================
+  // Photo Strip State
+  // ========================================
   const [stripPhotos, setStripPhotos] = useState<string[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>(templates[0].id);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
-  // Custom hooks
+  // ========================================
+  // Custom Hooks
+  // ========================================
   const camera = useCamera();
   const fabricStickers = useFabricStickers();
   const gallery = usePhotoGallery();
 
+  // ========================================
+  // Session Management
+  // ========================================
+  const [sessionId, setSessionId] = useState<string>('');
+
   // Refs for strip capture
   const stripCaptureTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Get current template
+  /**
+   * Initialize or restore session from localStorage
+   * This ensures session persists across page refreshes
+   * Toast notification is shown only on new session creation
+   */
+  useEffect(() => {
+    let currentSession = localStorage.getItem('sessionId');
+
+    if (!currentSession) {
+      currentSession = uuidv4();
+      localStorage.setItem('sessionId', currentSession);
+      console.log('🆕 Membuat session baru:', currentSession);
+      
+      toast({
+        title: '🎉 Session Created',
+        description: `Session ID: ${currentSession.slice(0, 8)}...`,
+        duration: 3000,
+      });
+    } else {
+      console.log('♻️ Memakai session lama:', currentSession);
+    }
+
+    setSessionId(currentSession);
+  }, []);
+
+  /**
+   * Create a new session and persist it to localStorage
+   * Triggered when user clicks "New Session" button
+   * Automatically updates QR code and gallery view
+   */
+  const handleNewSession = () => {
+    const newSession = uuidv4();
+    localStorage.setItem('sessionId', newSession);
+    setSessionId(newSession);
+
+    console.log('🆕 Session baru dibuat:', newSession);
+    
+    toast({
+      title: '✅ Session diperbarui',
+      description: `Session ID baru: ${newSession.slice(0, 8)}... telah aktif.`,
+      duration: 3000,
+    });
+  };
+
+  /**
+   * Auto-save function to save every captured photo to database
+   * Triggered automatically after each photo capture in strip mode
+   */
+  const autoSaveSinglePhoto = useCallback(
+    async (base64Image: string, photoNumber: number) => {
+      try {
+        console.log(`📸 Auto-saving single photo ${photoNumber} to database...`);
+
+        const response = await fetch('/api/single-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Image,
+            sessionId,
+            userId: null, // Set to actual userId if user is logged in
+            metadata: {
+              photoNumber,
+              templateId: selectedTemplate,
+              captureTime: new Date().toISOString(),
+              hasStickers: fabricStickers.appliedStickers.length > 0,
+              stickerCount: fabricStickers.appliedStickers.length,
+            },
+            queueNumber: photoNumber,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          console.log('✅ Single photo saved successfully to database:', result.data.id);
+        } else {
+          console.error('❌ Failed to save single photo:', result.error);
+          toast({
+            title: 'Warning',
+            description: 'Photo captured but failed to save to database',
+            variant: 'destructive',
+          });
+        }
+      } catch (error) {
+        console.error('❌ Error auto-saving single photo:', error);
+        // Don't show error toast to user - this is background operation
+      }
+    },
+    [sessionId, selectedTemplate, fabricStickers.appliedStickers.length]
+  );
+
+  /**
+   * Get current selected template configuration
+   */
   const currentTemplate = templates.find((t) => t.id === selectedTemplate) || templates[0];
 
-  // Initialize camera on mount
+  /**
+   * Initialize camera on component mount
+   * Cleanup camera and fabric canvas on unmount
+   */
   useEffect(() => {
     camera.startCamera();
 
@@ -67,7 +180,10 @@ export default function PhotoBooth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Helper function to reapply background
+  /**
+   * Reapply the current background to ensure proper layering
+   * Used after reinitializing Fabric canvas
+   */
   const reapplyCurrentBackground = useCallback(() => {
     if (fabricStickers.selectedBackground) {
       const currentBg = backgrounds.find((bg) => bg.id === fabricStickers.selectedBackground);
@@ -126,23 +242,41 @@ export default function PhotoBooth() {
       try {
         if (photos.length === 0) return null;
 
-        // Use the proper photo strip creation function that handles different layouts
         const stripImage = await createPhotoStrip({
           template: {
             ...currentTemplate,
-            hasBorders: currentTemplate.hasBorders ?? true, // Ensure hasBorders is boolean
-            flattened: currentTemplate.flattened ?? true, // Ensure flattened is boolean
+            hasBorders: currentTemplate.hasBorders ?? true,
+            flattened: currentTemplate.flattened ?? true,
           },
           photos,
         });
 
+        // Misal stripImage hasilnya adalah URL dari foto akhir
+        if (stripImage) {
+          await fetch("/api/save-photo", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: stripImage,
+              userId: 1, // bisa ambil dari session auth user login
+              sessionId: crypto.randomUUID(),
+              filename: `photo_${Date.now()}.jpg`,
+              storagePath: stripImage, // kalau kamu simpan di cloud, ini URL cloud-nya
+            }),
+          });
+        }
+
         return stripImage;
-      } catch {
+      } catch (err) {
+        console.error("Error createCompositeStripImage:", err);
         return null;
       }
     },
     [currentTemplate],
   );
+
 
   // Unified photo capture handler that waits for the actual captured image
   const handleStripTimerComplete = useCallback(async () => {
@@ -163,6 +297,9 @@ export default function PhotoBooth() {
       const requiredPhotos = template?.photoCount ?? 1;
       const updatedStripPhotos = [...stripPhotos, capturedImageUrl];
       const photosCount = updatedStripPhotos.length;
+
+      // ✅ AUTO-SAVE: Save every single captured photo to database
+      autoSaveSinglePhoto(capturedImageUrl, photosCount);
 
       // Update strip photos state
       setStripPhotos(updatedStripPhotos);
@@ -237,6 +374,7 @@ export default function PhotoBooth() {
     t,
     createCompositeStripImage,
     currentPhotoIndex,
+    autoSaveSinglePhoto,
   ]);
 
   // Download functionality
@@ -266,21 +404,7 @@ export default function PhotoBooth() {
     }
   }, [camera, fabricStickers, isDownloading]);
 
-  // Save to gallery
-  const savePhotoToGallery = useCallback(async () => {
-    const finalImage = fabricStickers.exportCanvasAsImage();
-    if (finalImage) {
-      await gallery.saveToGallery(finalImage, {
-        hasStickers: fabricStickers.appliedStickers.length > 0,
-        stickerCount: fabricStickers.appliedStickers.length,
-      });
 
-      toast({
-        title: 'Photo saved!',
-        description: 'Your photo has been saved to the gallery.',
-      });
-    }
-  }, [fabricStickers, gallery]);
 
   // Photo strip functionality - remove unused function
   const clearPhotoStrip = useCallback(() => {
@@ -301,10 +425,14 @@ export default function PhotoBooth() {
     setStripPhotos([]);
     setCurrentPhotoIndex(0);
     setIsTimerActive(false);
-    camera.retakePhoto(); // Clear captured image
+    camera.retakePhoto();
+
     if (stripCaptureTimeoutRef.current) {
       clearTimeout(stripCaptureTimeoutRef.current);
     }
+
+    // 🆕 Buat session baru menggunakan handleNewSession
+    handleNewSession();
   }, [camera]);
 
   // Enhanced template selector handler
@@ -323,6 +451,7 @@ export default function PhotoBooth() {
   const handleSelectTab = useCallback(
     (tab: string) => {
       setActiveTab(tab);
+      
       // If switching to camera tab, reset photo session
       if (tab === 'camera') {
         resetPhotoSession();
@@ -332,8 +461,17 @@ export default function PhotoBooth() {
           camera.startCamera(); // Restart camera after a short delay
         }, 100);
       }
+      
+      // Show toast notification when opening QR tab
+      if (tab === 'qr') {
+        toast({
+          title: '📱 QR Code Ready',
+          description: `Session: ${sessionId.slice(0, 8)}... • Scan to view gallery`,
+          duration: 3000,
+        });
+      }
     },
-    [camera, resetPhotoSession],
+    [camera, resetPhotoSession, sessionId],
   );
 
   // Reset timer and strip state when template changes
@@ -344,6 +482,56 @@ export default function PhotoBooth() {
       setCurrentPhotoIndex(0);
     }
   }, [selectedTemplate, stripPhotos.length]);
+
+const savePhotoToGallery = useCallback(async () => {
+  try {
+    const finalImage = fabricStickers.exportCanvasAsImage(); // hasil base64
+    if (!finalImage) {
+      toast({
+        title: "❌ Error",
+        description: "Tidak ada gambar untuk disimpan.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Kirim base64 langsung sebagai JSON
+    const res = await fetch("/api/gallery/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: null,
+        sessionId,
+        base64Image: finalImage,
+        metadata: {
+          hasStickers: fabricStickers.appliedStickers.length > 0,
+          stickerCount: fabricStickers.appliedStickers.length,
+        },
+      }),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      toast({
+        title: "✅ Berhasil!",
+        description: "Foto sudah disimpan ke galeri.",
+      });
+    } else {
+      toast({
+        title: "❌ Gagal Upload",
+        description: data.error || "Terjadi kesalahan saat menyimpan foto.",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    toast({
+      title: "⚠️ Error",
+      description: "Gagal menghubungi server.",
+    });
+  }
+}, [fabricStickers, sessionId]);
+
+
 
   return (
     <div className='w-full max-w-4xl mx-auto p-4 space-y-4'>
@@ -369,10 +557,16 @@ export default function PhotoBooth() {
               <TabsTrigger value='gallery' className='flex items-center gap-2 px-2 py-3'>
                 <ImageIcon className='h-4 w-4' />
                 <span className='hidden sm:inline'>
-                  {t.gallery} ({gallery.galleryPhotos.length})
+                  {t.gallery} 
                 </span>
                 <span className='sm:hidden'>({gallery.galleryPhotos.length})</span>
+                </TabsTrigger>
+              <TabsTrigger value='qr' className='flex items-center gap-2 px-2 py-3'>
+                <QrCode className='h-4 w-4' />
+                <span className='hidden sm:inline'>QR Code</span>
+                <span className='sm:hidden'>QR</span>
               </TabsTrigger>
+
             </TabsList>
 
             {/* Camera Tab */}
@@ -431,13 +625,12 @@ export default function PhotoBooth() {
                   {camera.isCapturing ? t.capturing : t.takePhoto}
                 </Button>
 
-                {/* Show reset button if there's an active session */}
-                {(stripPhotos.length > 0 || isTimerActive || camera.capturedImage) && (
-                  <Button onClick={resetPhotoSession} variant='outline' size='lg'>
-                    <RefreshCw className='mr-2 h-5 w-5' />
-                    New Session
-                  </Button>
-                )}
+
+                <Button onClick={resetPhotoSession} variant='outline' size='lg'>
+                  <RefreshCw className='mr-2 h-5 w-5' />
+                  New Session
+                </Button>
+
               </div>
             </TabsContent>
 
@@ -532,14 +725,19 @@ export default function PhotoBooth() {
                           {isDownloading ? t.downloading : t.download}
                         </Button>
 
-                        <Button
-                          onClick={savePhotoToGallery}
-                          disabled={gallery.isSaving}
-                          size='lg'
-                          className='bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200'>
-                          <ImageIcon className='mr-2 h-4 w-4' />
-                          {gallery.isSaving ? t.saving : t.saveToGallery}
-                        </Button>
+
+                        
+                        {   <Button
+                              onClick={savePhotoToGallery}
+                              disabled={gallery.isSaving}
+                              size='lg'
+                              className='bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200'>
+                              <ImageIcon className='mr-2 h-4 w-4' />
+                              {gallery.isSaving ? t.saving : t.saveToGallery}
+                            </Button>
+                            }
+
+                     
 
                         {fabricStickers.appliedStickers.length > 0 && (
                           <Button 
@@ -592,14 +790,21 @@ export default function PhotoBooth() {
 
             {/* Gallery Tab */}
             <TabsContent value='gallery' className='p-4'>
-              <PhotoGallery
-                photos={gallery.galleryPhotos.map((photo) => ({
-                  id: photo.id,
-                  imageData: photo.src,
-                  timestamp: photo.timestamp,
-                }))}
-                onDeletePhoto={gallery.deleteFromGallery}
-              />
+              {sessionId && <PhotoGallery key={sessionId} />}
+            </TabsContent>
+
+            {/* QR Code Tab */}
+            <TabsContent value='qr' className='p-4'>
+              <div className='flex flex-col items-center justify-center min-h-[500px]'>
+                {sessionId ? (
+                  <QrGenerator sessionId={sessionId} />
+                ) : (
+                  <div className='text-center space-y-4'>
+                    <RefreshCw className='h-16 w-16 text-gray-300 mx-auto animate-spin' />
+                    <p className='text-gray-400'>Initializing session...</p>
+                  </div>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
