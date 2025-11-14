@@ -133,7 +133,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang='en'>
+    <html lang='en' suppressHydrationWarning>
       <head>
         {/* Preconnect to external domains for performance */}
         <link rel='preconnect' href='https://fonts.googleapis.com' />

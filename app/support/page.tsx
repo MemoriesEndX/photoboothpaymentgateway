@@ -222,8 +222,22 @@ export default function SupportPage() {
               </div>
             </CardContent>
           </Card>
+          {/* Trakteer Support Button */}
+<div className="mt-6 flex justify-center">
+  <a
+    href="https://trakteer.id/memories-endx"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition"
+  >
+    ☕ Trakteer Coffee
+  </a>
+</div>
+
         </div>
       </div>
     </div>
+
+    
   );
 }

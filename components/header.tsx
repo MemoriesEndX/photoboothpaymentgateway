@@ -23,7 +23,7 @@ export default function Header() {
   const userEmail = session?.user?.email ?? "";
   const roleVal = (session?.user as unknown as { role?: string })?.role;
   const createdAt = (session?.user as unknown as { createdAt?: string })?.createdAt;
-  const userRole = typeof roleVal === "string" ? roleVal : "guest";
+  const userRole = typeof roleVal === "string" ? roleVal.toUpperCase().replace(/_/g, "") : "GUEST";
 
   // Format tanggal akun dibuat
   const formattedDate = createdAt
@@ -84,17 +84,19 @@ export default function Header() {
               { name: "Privacy", href: "/privacy" },
               { name: "Support", href: "/support" },
               { name: "Terms", href: "/terms" },
-              { name: "Users", href: "/users" },
-            ].map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="relative px-3 py-2 text-gray-300 hover:text-white transition group"
-              >
-                <span>{item.name}</span>
-                <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-indigo-400 to-pink-500 group-hover:w-full transition-all duration-300 rounded-full"></span>
-              </Link>
-            ))}
+              { name: "Super Admin", href: "/admin", roleRequired: "SUPERADMIN" },
+            ]
+              .filter((item) => !item.roleRequired || userRole === item.roleRequired)
+              .map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="relative px-3 py-2 text-gray-300 hover:text-white transition group"
+                >
+                  <span>{item.name}</span>
+                  <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-gradient-to-r from-indigo-400 to-pink-500 group-hover:w-full transition-all duration-300 rounded-full"></span>
+                </Link>
+              ))}
           </nav>
 
           {/* 🌐 Kanan Header */}
@@ -118,7 +120,7 @@ export default function Header() {
                   {userRole === "GUEST" && userEmail === "guest@photobooth.com"
                     ? "Pengunjung"
                     : userName}
-                  {userRole === "super_admin" && (
+                  {userRole === "SUPERADMIN" && (
                     <span className="text-xs bg-white/30 text-white px-2 py-0.5 rounded-md font-semibold">
                       Super Admin
                     </span>
