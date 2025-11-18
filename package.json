@@ -18,18 +18,15 @@
     "pwa"
   ],
   "author": {
-    "name": "Tedy Fazrin",
-    "url": "https://tedyfazrin.com"
+    "name": "Tedy Fazrin & Memories EndX",
+    "url": "https://tedyfazrin.com",
+    "url 2": "https://portofoliomemoriesendx.vercel.app/"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tedy69/photobooth"
+    "url": "https://github.com/tedy69/photobooth",
+    "url 2": "https://github.com/MemoriesEndX/photoboothpaymentgateway"
   },
-  "bugs": {
-    "url": "https://github.com/tedy69/photobooth/issues"
-  },
-  "homepage": "https://github.com/tedy69/photobooth#readme",
-  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

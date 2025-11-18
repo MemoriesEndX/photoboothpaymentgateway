@@ -1,465 +1,306 @@
 # 📸 Advanced Photo Booth Web App
 
+**Next.js 15 • Prisma • PostgreSQL • NextAuth • Resend • Local Storage • Queue System • AI Agent Integration**
 
-versi lengkap dan konsisten dengan arsitektur, flowchart, database, dan API dari proyekmu sendiri, bukan dari repo asal tedy69/photobooth.
+Aplikasi photobooth modern dengan fokus pada:
 
-Untuk konfirmasi sebelum aku tulis versi finalnya, aku mau pastikan beberapa hal dulu:
+* **Keamanan dan privasi foto**
+* **Private session storage**
+* **Auto queue system**
+* **Penyimpanan lokal di VPS / Server**
+* Upgrade opsional: **S3 / GCS / R2**
+* **NextAuth admin login**
+* **Resend email integration**
+* Middleware proteksi file berbasis session
 
-🧩 Basis proyek:
-Apakah kamu ingin versi final ini tetap memakai Next.js (frontend) + API Routes bawaan Next.js (tanpa Laravel backend), atau tetap hybrid (Next.js  Prisma API) seperti blueprint sebelumnya?
+---
 
-☁️ Storage:
-Masih ingin menggunakan S3/GCS untuk penyimpanan foto seperti blueprint kemarin?
+## ✨ Features Overview
 
-💳 Payment gateway:
-Gunakan Midtrans (untuk lokal) seperti blueprint kamu, atau cukup tulis generic payment integration (Stripe/Midtrans supported)?
+### 📸 Photo Capture
 
-📧 Email form:
-Tetap menggunakan Web3Forms + SUPPORT_EMAIL seperti yang sudah kamu buat sebelumnya?
+* Real-time webcam capture
+* Single-photo mode
+* Auto-save ke Prisma (`SinglePhoto`)
+* Private folder per session
 
+### 🎨 Editor Tools
 
-A sophisticated, fully-featured photo booth web application with real-time camera capture, professional photo strips, advanced sticker system, custom backgrounds/frames, and comprehensive internationalization support.
+* Stickers (fabric.js)
+* Custom frames & backgrounds
+* Photo strip 3–5 panel
 
-## 📋 Table of Contents
+### 🔒 Authentication (NextAuth)
 
-- [✨ Features](#-features)
-- [🚀 Quick Start](#-quick-start)
-- [📋 How to Use](#-how-to-use)
-- [🏗️ Architecture](#️-architecture)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🔧 Configuration](#-configuration)
-- [🤝 Contributing](#-contributing)
-- [🔒 Security](#-security)
-- [🌟 Community & Contributors](#-community--contributors)
-- [🐛 Troubleshooting](#-troubleshooting)
-- [📄 License](#-license)
-- [👨‍💻 Author & Support](#-author--support)
+* Credentials Provider (email + password)
+* JWT-based session
+* Admin-only dashboard
 
-## ✨ Features
+### 📧 Email Integration (Resend)
 
-### 📸 Camera & Photo Capture
+* Pengiriman link galeri
+* Notifikasi event
+* Bisa dikembangkan ke OTP/verification
 
-- **Real-time camera access** with high-quality photo capture
-- **Multiple photo strip templates** (1-photo, 2-photo, 4-photo strips)
-- **Professional photo layouts** (vertical strips, grid layouts, single photos)
-- **Automatic photo strip composition** with proper spacing and borders
-- **Flash effect** and smooth capture animations
+### 🗂 Storage Options
 
-### 🎨 Advanced Editing System
+**Default: Local Storage di Server / VPS**
 
-- **Custom backgrounds** (solid colors, gradients, patterns)
-- **Professional frames** with various styles and effects
-- **SVG sticker support** with PNG conversion for optimal rendering
-- **Drag-and-drop sticker placement** with resize and rotation
-- **Layered composition** (background → photo → stickers)
-- **Real-time preview** with Fabric.js canvas integration
+```
+/public/uploads/{sessionId}/{filename}.jpg
+```
 
-### 🖼️ Photo Management
+✔ Cocok untuk event
+✔ Cepat, tanpa biaya storage
+✔ Bisa dibuat private via middleware
 
-- **Local photo gallery** with persistent storage
-- **High-quality photo export** (JPEG with optimized compression)
-- **Instant download functionality**
-- **Photo strip creation** with multiple layouts
-- **Background/frame application** before photo capture
+**Optional Upgrade:**
 
-### 🌍 Internationalization
+* Amazon S3
+* Google Cloud Storage
+* Cloudflare R2
 
-- **7 language support**: English, Spanish, French, German, Japanese, Chinese, Portuguese
-- **Dynamic language switching** with persistent preference
-- **Localized UI elements** and user feedback messages
-- **Right-to-left (RTL) text support** for applicable languages
+### 🔢 Queue System (Antrian)
 
-### 📱 User Experience
+* Pengunjung otomatis mendapat nomor antrian
+* SessionId + queue number tersimpan di cookie
+* Cocok untuk event photobooth besar
 
-- **Fully responsive design** optimized for mobile, tablet, and desktop
-- **Progressive Web App (PWA) ready**
-- **Accessibility compliant** with keyboard navigation and screen reader support
-- **Modern Material Design** with smooth animations
-- **Toast notifications** for user feedback
-- **Loading states** and error handling
+### 🧠 AI Agent Integration
 
-### 🔧 Technical Features
+* Validasi environment
+* Cek koneksi database
+* Memantau upload system
+* Auto-debug engine
 
-- **Modular architecture** with custom React hooks
-- **TypeScript throughout** for type safety
-- **Optimized performance** with lazy loading and code splitting
-- **Professional build pipeline** with Next.js 14
-- **Clean console output** (production-ready, no debug logs)
+### 🌍 Additional Features
 
-## 🚀 Quick Start
+* i18n multi-language
+* PWA-ready
+* Responsive mobile
 
-### Prerequisites
+---
 
-- Node.js 18+
-- npm, pnpm, or yarn package manager
+# 🧩 Key Features (Detail)
 
-### Installation
+## 🔒 Private Photo Sessions
 
-1. **Clone the repository:**
+Setiap pengunjung mendapatkan sessionId unik.
+Semua foto hanya bisa diakses oleh session tersebut.
 
-   ```bash
-   git clone <https://github.com/tedy69/photobooth>
-   cd photobooth
-   ```
+```
+/public/uploads/{sessionId}/
+```
 
-2. **Install dependencies:**
+Middleware otomatis memblokir akses asing.
 
-   ```bash
-   npm install
-   # or
-   pnpm install
-   # or
-   yarn install
-   ```
+---
 
-3. **Set up environment variables:**
+## 🔢 Queue System
 
-   ```bash
-   cp .env.example .env
-   ```
+* Pengunjung baru → auto-generate queue number
+* Cocok untuk:
 
-   Configure your `.env` file:
+  * Event photobooth
+  * Wedding photo corner
+  * Booth expo / pameran
 
-   ```env
-   WEB3FORMS_ACCESS_KEY=your_web3forms_access_key
-   SUPPORT_EMAIL=your_email@example.com
-   ```
+---
 
-4. **Start development server:**
+## 📸 Capture & Upload Flow
 
-   ```bash
-   npm run dev
-   # or
-   pnpm dev
-   # or
-   yarn dev
-   ```
+1. Browser → capture foto
+2. Kirim ke API Next.js
+3. API simpan ke local storage
+4. Prisma mencatat metadata foto
 
-5. **Open the app:**
-   Navigate to [http://localhost:3000](http://localhost:3000) in your browser
+---
 
-### Production Build
+## 🗄 Storage Layer
+
+### **Local Storage** *(default & recommended)*
+
+```
+/public/uploads/sessionId/filename.jpg
+```
+
+### **Cloud Storage (Optional)**
+
+Support:
+
+* S3
+* Google Cloud Storage
+* Cloudflare R2
+
+Prisma tetap menyimpan URL.
+
+---
+
+# 🚀 Quick Start
+
+## 1. Clone Repo
 
 ```bash
-npm run build
-npm start
+git clone https://github.com/yourrepo/photobooth
+cd photobooth
 ```
 
-## 📋 How to Use
+## 2. Install Dependencies
 
-### 1. **Camera Setup**
-
-- Grant camera permissions when prompted
-- Position yourself in the camera view
-- Select your preferred photo template (single photo or strip)
-
-### 2. **Choose Background & Frame**
-
-- Browse available backgrounds (colors, gradients, patterns)
-- Select a decorative frame style
-- Preview your selection in real-time
-
-### 3. **Capture Photos**
-
-- **Single Photo**: Click "Take Photo" for instant capture
-- **Photo Strip**: Click "Take Photo" to start the timer sequence
-  - Multiple photos captured automatically (every 5 seconds)
-  - Timer shows progress and countdown
-  - Complete strip created automatically
-
-### 4. **Edit & Enhance**
-
-- Add stickers by dragging from the sticker panel
-- Resize stickers using corner handles
-- Rotate stickers by dragging
-- Remove stickers with delete key or remove button
-- Change backgrounds/frames anytime
-
-### 5. **Save & Share**
-
-- Download high-quality images instantly
-- Save to local gallery for later access
-- Photos persist between sessions
-
-## 🏗️ Architecture
-
-### **Modular Design**
-
-The app uses a clean, modular architecture with specialized hooks:
-
-```typescript
-// Custom Hooks
-useCamera(); // Camera access, photo capture
-useFabricStickers(); // Canvas management, stickers, backgrounds
-usePhotoGallery(); // Local storage, photo management
-useLanguage(); // Internationalization
+```bash
+npm install
 ```
 
-### **Component Structure**
+## 3. Setup Environment
 
-```
-components/
-├── photo-booth.tsx           # Main application logic
-├── background-frame-selector.tsx  # Background/frame selection
-├── sticker-selector.tsx      # Sticker browsing and selection
-├── photo-gallery.tsx         # Gallery view and management
-├── timer-indicator.tsx       # Photo strip countdown timer
-└── ui/                      # Reusable UI components
+```bash
+cp .env.example .env
 ```
 
-### **State Management**
-
-- **React hooks** for local component state
-- **Context providers** for shared state (language, theme)
-- **Local storage** for persistence (photos, preferences)
-- **Canvas state** managed through Fabric.js integration
-
-## 🛠️ Tech Stack
-
-### **Frontend Framework**
-
-- **Next.js 14** - React framework with App Router and server-side rendering
-- **TypeScript** - Full type safety throughout the application
-- **React 18** - Modern React with hooks and concurrent features
-
-### **UI & Styling**
-
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **Radix UI** - Headless, accessible component primitives
-- **Lucide React** - Beautiful, customizable icon library
-- **Fabric.js** - Powerful canvas library for image manipulation
-
-### **Image Processing**
-
-- **Canvas API** - Native browser image capture and processing
-- **File API** - Handle image uploads and downloads
-- **Base64 encoding** - Efficient image data management
-
-### **Internationalization**
-
-- **Custom i18n system** - Lightweight, type-safe translations
-- **Dynamic imports** - Language bundles loaded on demand
-- **Locale persistence** - User language preference storage
-
-### **Development Tools**
-
-- **ESLint** - Code linting and style enforcement
-- **Prettier** - Code formatting
-- **Husky** - Git hooks for code quality
-- **VS Code integration** - Optimized developer experience
-
-## 🔧 Configuration
-
-### **Environment Variables**
+Isi sesuai kebutuhan:
 
 ```env
-# Email service configuration (optional)
-WEB3FORMS_ACCESS_KEY=your_web3forms_key
-SUPPORT_EMAIL=support@yoursite.com
+DATABASE_URL=postgres://...
+NEXTAUTH_SECRET=xxxx
+NEXTAUTH_URL=http://localhost:3000
 
-# App configuration
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Storage
+STORAGE_MODE=local
+
+# Email
+RESEND_API_KEY=your_api_key
+SUPPORT_EMAIL=your@email
 ```
 
-### **Browser Support**
-
-- **Chrome/Edge** 90+ (full features)
-- **Firefox** 88+ (full features)
-- **Safari** 14+ (full features)
-- **Mobile browsers** iOS 14+, Android 10+
-
-### **Camera Requirements**
-
-- HTTPS required for camera access (or localhost for development)
-- User permission required for camera and microphone
-- Fallback UI for devices without camera access
-
-## 🤝 Contributing
-
-We welcome contributions from developers of all skill levels! This project is designed to be developer-friendly and extensible.
-
-### **📋 Quick Contributing Guide**
-
-1. **📖 Read the [Contributing Guidelines](.github/CONTRIBUTING.md)** - Comprehensive guide with development setup, code style, and best practices
-2. **🔍 Check existing [Issues](../../issues)** - See what needs to be done or report bugs
-3. **💡 Propose ideas** in [Discussions](../../discussions) - Share feature ideas and get feedback
-4. **🔒 Report security issues** via our [Security Policy](.github/SECURITY.md)
-
-### **🚀 Quick Start for Contributors**
+## 4. Setup Database
 
 ```bash
-# 1. Fork and clone
-git clone https://github.com/tedy69/photobooth.git
-cd photobooth
-
-# 2. Install dependencies
-npm install
-
-# 3. Start development
-npm run dev
-
-# 4. Create feature branch
-git checkout -b feature/amazing-new-feature
-
-# 5. Make changes and test
-npm run build && npm run lint && npm run type-check
+npx prisma migrate dev
 ```
 
-### **🎯 Areas We Need Help With**
+## 5. Start Development
 
-| Priority | Area | Description |
-|----------|------|-------------|
-| 🔥 **High** | **Unit Tests** | Add tests for custom hooks and components |
-| 🔥 **High** | **New Languages** | Add translations for additional languages |
-| 📈 **Medium** | **Sticker Collections** | Add more SVG sticker categories |
-| 📈 **Medium** | **PWA Features** | Enhance progressive web app capabilities |
-| 💡 **Low** | **New Templates** | Additional photo strip layouts |
-| 💡 **Low** | **Animations** | Enhanced UI transitions and effects |
+```bash
+npm run dev
+```
 
-### **📝 Issue Templates**
+---
 
-We provide structured templates to help you contribute effectively:
+# 🏗 Architecture Overview
 
-- **🐛 [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)** - Report issues with detailed information
-- **✨ [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md)** - Suggest new features or enhancements  
-- **📚 [Documentation](.github/ISSUE_TEMPLATE/documentation.md)** - Improve guides and documentation
+## 🎨 Frontend
 
-### **🔧 Easy Ways to Contribute**
+* Next.js 15 (App Router)
+* TailwindCSS
+* React Server Components
+* Dynamic import optimization
 
-#### **🎨 New Stickers**
-Add SVG files to `/public/stickers/` and they'll be automatically available.
+## 🔧 Backend
 
-#### **🌍 New Languages**  
-1. Create translation file in `/lib/translations/[locale].ts`
-2. Export from `/lib/translations/index.ts`
-3. Follow existing translation key structure
+* Next.js API Routes
+* Prisma ORM
+* PostgreSQL
+* Secure upload pipeline
+* Session-bound filesystem
 
-#### **📸 New Photo Templates**
-Add templates to `/lib/frames.ts` with layout specifications.
+## 🗄 Storage Layer
 
-#### **🎨 New Backgrounds**
-Add background definitions to `/lib/backgrounds.ts` with type and properties.
+### Local Mode
 
-### **📋 Before Contributing**
+* Per-session folder
+* Middleware access control
+* Best for performance
 
-- ✅ **Read** [Contributing Guidelines](.github/CONTRIBUTING.md) for detailed instructions
-- ✅ **Check** existing issues to avoid duplicates  
-- ✅ **Follow** our code style and commit message conventions
-- ✅ **Test** your changes thoroughly across browsers
-- ✅ **Update** documentation for new features
+### Cloud Mode
 
-### **🏆 Recognition**
+* S3/GCS/R2 ready
+* Private/public mode
 
-All contributors are recognized in our:
-- 📋 **Contributors section** in this README
-- 📝 **Release notes** for significant contributions  
-- 🎉 **Special thanks** for major features
+---
 
-**See our [Contributing Guidelines](.github/CONTRIBUTING.md) for complete details!**
+# 📦 Dependencies (FULL)
 
-## 🔒 Security
+## **Main Dependencies**
 
-Security is a top priority for the Advanced PhotoBooth App. We are committed to protecting user privacy and ensuring the integrity of the application.
+| Package                    | Description              |
+| -------------------------- | ------------------------ |
+| @aws-sdk/client-s3         | Opsional untuk upload S3 |
+| @prisma/client             | ORM database             |
+| @radix-ui/*                | UI primitives            |
+| fabric                     | Editor image engine      |
+| framer-motion              | Animations               |
+| next                       | App framework            |
+| react                      | UI library               |
+| resend                     | Email service            |
+| next-auth                  | Authentication           |
+| prisma                     | ORM engine               |
+| bcrypt / bcryptjs          | Hash password            |
+| html2canvas                | Screenshot               |
+| lucide-react               | Icons                    |
+| qrcode / qrcode.react      | QR generator             |
+| nodemailer                 | Email (optional)         |
+| tailwindcss / autoprefixer | Styling                  |
+| uuid                       | ID generator             |
+| clsx / cva                 | Class utilities          |
+| next-themes                | Dark mode                |
+| sonner                     | Toast UI                 |
+| recharts                   | Analytics graphs         |
 
-### **🛡️ Security Features**
-- **Local Processing**: All image processing happens client-side - no data sent to servers
-- **Camera Permissions**: Explicit user consent required for camera access
-- **HTTPS Only**: Production deployments enforce HTTPS connections
-- **No Tracking**: Zero analytics or tracking without explicit consent
-- **User Control**: Complete control over local data storage and deletion
+## **Dev Dependencies**
 
-### **🚨 Reporting Security Issues**
-**Please DO NOT report security vulnerabilities through public GitHub issues.**
+| Package                     | Description          |
+| --------------------------- | -------------------- |
+| prisma                      | Schema & migration   |
+| typescript                  | TS support           |
+| ts-node                     | Run TS scripts       |
+| eslint + eslint-config-next | Linting              |
+| prettier                    | Formatting           |
+| postcss                     | Tailwind integration |
+| @types/*                    | TS type definitions  |
 
-- **📧 Email**: gmail@tedyfazrin.com  
-- **📋 Process**: See our [Security Policy](.github/SECURITY.md) for detailed reporting instructions
-- **⏱️ Response**: Initial response within 48 hours
+---
 
-### **🔍 Security Scope**
-- Camera access vulnerabilities
-- Data storage and privacy issues  
-- XSS/CSRF vulnerabilities
-- File upload security
-- Session management (if applicable)
+# 🔧 Configuration Notes
 
-**Read our complete [Security Policy](.github/SECURITY.md) for full details.**
+### Browser Requirements
 
-## 🌟 Community & Contributors
+* HTTPS untuk akses kamera
+* iOS/Android mobile tested
+* Desktop Chrome/Firefox/Edge
 
-### **👥 Contributors**
+### Camera Handling
 
-We appreciate all contributors who help make this project better! 
+* Full HD support
+* Fallback detection jika kamera tidak ada
 
-<!-- Contributors will be automatically listed here -->
-<a href="https://github.com/tedy69/photobooth/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=tedy69/photobooth" />
-</a>
+---
 
-### **🏆 Special Thanks**
+# 🐛 Troubleshooting
 
-- **🎨 Design Inspiration**: Modern photo booth interfaces and Material Design principles
-- **🔧 Technical Foundation**: Next.js, React, and Fabric.js communities
-- **🌍 Internationalization**: Contributors who helped with translations
-- **🧪 Testing**: Community members who tested across different devices and browsers
+| Masalah                 | Penyebab             | Solusi                         |
+| ----------------------- | -------------------- | ------------------------------ |
+| Foto tidak tersimpan    | Permissions VPS      | `chmod -R 755 public/uploads`  |
+| Session hilang          | Cookie tidak persist | Set domain & path secara benar |
+| Kamera tidak terdeteksi | Tidak HTTPS          | Gunakan localhost atau HTTPS   |
 
-### **🤝 How to Join the Community**
+---
 
-1. **⭐ Star the repository** to show your support
-2. **🐛 Report bugs** using our structured issue templates  
-3. **💡 Suggest features** through GitHub discussions
-4. **🔧 Contribute code** following our contributing guidelines
-5. **📚 Improve documentation** to help other users and developers
-6. **🌍 Add translations** for your language
-7. **🎨 Share your customizations** in discussions
+# 📄 License
 
-### **📢 Community Guidelines**
+MIT License — bebas dipakai untuk proyek personal/komersial.
 
-- **Be respectful** and inclusive in all interactions
-- **Help newcomers** learn and contribute  
-- **Share knowledge** and best practices
-- **Follow our [Code of Conduct](CODE_OF_CONDUCT.md)**
-- **Use issue templates** for structured communication
+---
 
-## 🐛 Troubleshooting
+# 👨‍💻 Author & Support
 
-### **Camera Issues**
+Jika butuh bantuan integrasi NextAuth, Prisma, middleware, deployment VPS, atau setup AI Agent:
 
-- **Permission denied**: Ensure HTTPS or localhost
-- **No camera detected**: Check browser permissions
-- **Poor quality**: Verify camera resolution settings
+📧 Email: **[your-email@example.com](mailto:your-email@example.com)**
+💬 ChatGPT: tinggal bilang **"lanjutkan setup"**
 
-### **Performance Issues**
+---
 
-- **Slow sticker rendering**: Check browser Canvas API support
-- **Memory usage**: Clear gallery periodically on mobile devices
-- **Build issues**: Ensure Node.js 18+ is installed
-
-### **Language Issues**
-
-- **Missing translations**: Check translation file completeness
-- **Incorrect locale**: Verify browser language settings
-
-## 📄 License
-
-**MIT License** - Feel free to use this project for personal or commercial purposes.
-
-### Quick License Summary:
-
-✅ **Commercial use allowed**  
-✅ **Modification allowed**  
-✅ **Distribution allowed**  
-✅ **Private use allowed**
-
-📋 **License text must be included**  
-📋 **Copyright notice must be preserved**
-
-See [LICENSE](LICENSE) file for full details.
-
-## 👨‍💻 Author & Support
-
-**Created by [Tedy Fazrin](https://tedyfazrin.com)**
-
-### **🆘 Get Help & Support**
+### **🆘 The Original Repository**
 
 | Type | Where to Go | Description |
 |------|-------------|-------------|
@@ -470,28 +311,4 @@ See [LICENSE](LICENSE) file for full details.
 | � **Security Issues** | [gmail@tedyfazrin.com](mailto:gmail@tedyfazrin.com) | Private security vulnerability reporting |
 | 📧 **Direct Contact** | [gmail@tedyfazrin.com](mailto:gmail@tedyfazrin.com) | General inquiries and business |
 
-### **📚 Documentation & Resources**
-
-- **📖 [Contributing Guidelines](.github/CONTRIBUTING.md)** - Complete developer guide
-- **🔒 [Security Policy](.github/SECURITY.md)** - Security practices and reporting
-- **📋 [Issue Templates](.github/ISSUE_TEMPLATE/)** - Structured issue reporting
-- **🚀 [Pull Request Template](.github/pull_request_template.md)** - PR guidelines and checklist
-
-### **🌟 Community**
-
-- ⭐ **Star this repo** to show support and get updates
-- 👀 **Watch releases** for new features and security updates  
-- 🍴 **Fork** to create your own customizations
-- 💬 **Join discussions** to share ideas and feedback
-- 🤝 **Contribute** to help improve the project for everyone
-
-### **📊 Project Stats**
-
-![GitHub stars](https://img.shields.io/github/stars/tedy69/photobooth?style=social)
-![GitHub forks](https://img.shields.io/github/forks/tedy69/photobooth?style=social)
-![GitHub issues](https://img.shields.io/github/issues/tedy69/photobooth)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/tedy69/photobooth)
-
 ---
-
-**Made with ❤️ for the developer community**
