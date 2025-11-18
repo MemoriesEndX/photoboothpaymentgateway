@@ -26,7 +26,7 @@ import { useFabricStickers } from '@/hooks/use-fabric-stickers';
 import { usePhotoGallery } from '@/hooks/use-photo-gallery';
 import { templates } from '@/lib/templates';
 import { QrCode } from 'lucide-react';
-
+import HandleSendQrEmail from '@/components/handleSendQrEmail';
 
 
 
@@ -67,6 +67,10 @@ export default function PhotoBooth() {
    * This ensures session persists across page refreshes
    * Toast notification is shown only on new session creation
    */
+
+  interface QrGeneratorProps {
+  sessionId: string;
+}
   useEffect(() => {
     let currentSession = localStorage.getItem('sessionId');
 
@@ -463,7 +467,7 @@ export default function PhotoBooth() {
       }
       
       // Show toast notification when opening QR tab
-      if (tab === 'qr') {
+      if (tab === 'qr-send') {
         toast({
           title: '📱 QR Code Ready',
           description: `Session: ${sessionId.slice(0, 8)}... • Scan to view gallery`,
@@ -538,7 +542,7 @@ const savePhotoToGallery = useCallback(async () => {
       <Card className='overflow-hidden shadow-lg'>
         <CardContent className='p-0'>
           <Tabs value={activeTab} onValueChange={handleSelectTab} className='w-full'>
-            <TabsList className='grid w-full grid-cols-4 bg-muted/50 h-auto'>
+            <TabsList className='grid w-full grid-cols-5 bg-muted/50 h-auto'>
               <TabsTrigger value='camera' className='flex items-center gap-2 px-2 py-3'>
                 <Camera className='h-4 w-4' />
                 <span className='hidden sm:inline'>{t.camera}</span>
@@ -561,9 +565,9 @@ const savePhotoToGallery = useCallback(async () => {
                 </span>
                 <span className='sm:hidden'>({gallery.galleryPhotos.length})</span>
                 </TabsTrigger>
-              <TabsTrigger value='qr' className='flex items-center gap-2 px-2 py-3'>
+              <TabsTrigger value='qr-send' className='flex items-center gap-2 px-2 py-3'>
                 <QrCode className='h-4 w-4' />
-                <span className='hidden sm:inline'>QR Code</span>
+                <span className='hidden sm:inline'>Send QR</span>
                 <span className='sm:hidden'>QR</span>
               </TabsTrigger>
 
@@ -793,11 +797,26 @@ const savePhotoToGallery = useCallback(async () => {
               {sessionId && <PhotoGallery key={sessionId} />}
             </TabsContent>
 
-            {/* QR Code Tab */}
-            <TabsContent value='qr' className='p-4'>
+            {/* QR Code & Email Send Tab */}
+            <TabsContent value='qr-send' className='p-4'>
               <div className='flex flex-col items-center justify-center min-h-[500px]'>
                 {sessionId ? (
-                  <QrGenerator sessionId={sessionId} />
+                  <div className='w-full max-w-2xl space-y-6'>
+                    {/* QR Code Display Section */}
+                    <div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200'>
+                      <QrGenerator sessionId={sessionId} />
+                    </div>
+                    
+                    {/* Email Sending Section */}
+                    <div className='bg-white rounded-xl p-6 border border-gray-200 shadow-sm'>
+                      <HandleSendQrEmail 
+                        sessionId={sessionId}
+                        onSuccess={(email) => {
+                          console.log(`✅ QR sent to: ${email}`);
+                        }}
+                      />
+                    </div>
+                  </div>
                 ) : (
                   <div className='text-center space-y-4'>
                     <RefreshCw className='h-16 w-16 text-gray-300 mx-auto animate-spin' />

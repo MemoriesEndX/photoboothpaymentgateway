@@ -15,6 +15,7 @@ import {
   MessageSquare,
   CheckCircle,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -31,21 +32,23 @@ export default function SupportPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'idle' | 'success' | 'error';
+    message?: string;
+    ticketId?: number;
+  }>({ type: 'idle' });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Submit function that uses Web3Forms API with fallback to mailto
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus('idle');
+    setSubmitStatus({ type: 'idle' });
 
     try {
-      // Try to submit via API first (Web3Forms)
       const response = await fetch('/api/support', {
         method: 'POST',
         headers: {
@@ -54,22 +57,41 @@ export default function SupportPage() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      } else {
-        throw new Error('API submission failed');
-      }
-    } catch {
-      // Fallback to mailto
-      const mailtoLink = `mailto:${t.directEmail}?subject=${encodeURIComponent(
-        formData.subject,
-      )}&body=${encodeURIComponent(
-        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`,
-      )}`;
+      const data = await response.json();
 
-      window.location.href = mailtoLink;
-      setSubmitStatus('success');
+      if (response.ok && data.success) {
+        setSubmitStatus({
+          type: 'success',
+          message: data.message,
+          ticketId: data.ticketId,
+        });
+        setFormData({ name: '', email: '', subject: '', message: '' });
+
+        // Auto reset status after 5 seconds
+        setTimeout(() => {
+          setSubmitStatus({ type: 'idle' });
+        }, 5000);
+      } else {
+        throw new Error(data.error || 'Gagal mengirim pesan');
+      }
+    } catch (error: unknown) {
+      console.error('Submit error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan';
+
+      setSubmitStatus({
+        type: 'error',
+        message: errorMessage,
+      });
+
+      // Fallback to mailto if API fails
+      setTimeout(() => {
+        const mailtoLink = `mailto:memoriesendx@gmail.com?subject=${encodeURIComponent(
+          formData.subject
+        )}&body=${encodeURIComponent(
+          `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+        )}`;
+        window.location.href = mailtoLink;
+      }, 2000);
     } finally {
       setIsSubmitting(false);
     }
@@ -188,22 +210,43 @@ export default function SupportPage() {
                 </div>
 
                 {/* Status Messages */}
-                {submitStatus === 'success' && (
-                  <div className='flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-md'>
-                    <CheckCircle className='h-4 w-4' />
-                    <span className='text-sm'>{t.emailSent}</span>
+                {submitStatus.type === 'success' && (
+                  <div className='flex flex-col gap-2 text-green-600 bg-green-50 p-4 rounded-md'>
+                    <div className='flex items-center gap-2'>
+                      <CheckCircle className='h-5 w-5' />
+                      <span className='font-semibold'>Berhasil!</span>
+                    </div>
+                    <p className='text-sm'>{submitStatus.message}</p>
+                    {submitStatus.ticketId && (
+                      <p className='text-sm font-mono'>
+                        Ticket ID: <strong>#{submitStatus.ticketId}</strong>
+                      </p>
+                    )}
                   </div>
                 )}
 
-                {submitStatus === 'error' && (
-                  <div className='flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-md'>
-                    <AlertCircle className='h-4 w-4' />
-                    <span className='text-sm'>{t.emailError}</span>
+                {submitStatus.type === 'error' && (
+                  <div className='flex flex-col gap-2 text-red-600 bg-red-50 p-4 rounded-md'>
+                    <div className='flex items-center gap-2'>
+                      <AlertCircle className='h-5 w-5' />
+                      <span className='font-semibold'>Gagal mengirim</span>
+                    </div>
+                    <p className='text-sm'>{submitStatus.message}</p>
+                    <p className='text-xs text-red-500'>
+                      Anda akan diarahkan ke email client sebagai backup...
+                    </p>
                   </div>
                 )}
 
                 <Button type='submit' disabled={isSubmitting} className='w-full'>
-                  {isSubmitting ? t.sending : t.send}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      Mengirim...
+                    </>
+                  ) : (
+                    t.send
+                  )}
                 </Button>
               </form>
 
