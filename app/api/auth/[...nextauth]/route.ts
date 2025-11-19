@@ -2,6 +2,7 @@ import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
@@ -39,7 +40,7 @@ const handler = NextAuth({
           name: user.name || "",
           email: user.email || "",
           role: user.role,
-          createdAt: user.createdAt, // ✅ tambahkan ini
+          createdAt: user.createdAt,
         };
       },
     }),
@@ -54,22 +55,49 @@ const handler = NextAuth({
   },
 
   callbacks: {
+    async signIn({ user }) {
+      // 🔥 SINKRONISASI: Set cookie user_role saat login berhasil
+      // Ini akan membuat middleware bisa langsung membaca role user
+      try {
+        const cookieStore = await cookies();
+        if (user?.email && (user as any).role) {
+          cookieStore.set("user_role", (user as any).role, { 
+            path: "/",
+            httpOnly: false, // Biar bisa diakses client-side juga
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 60 * 60 * 24 * 7, // 7 hari
+          });
+          cookieStore.set("user_email", user.email, { 
+            path: "/",
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 60 * 60 * 24 * 7,
+          });
+        }
+      } catch (error) {
+        console.error("Error setting cookies:", error);
+      }
+      return true; // Allow sign in
+    },
+
     async jwt({ token, user }) {
-      // 🧩 Saat user login pertama kali, simpan createdAt ke token
+      // 🧩 Saat user login pertama kali, simpan data ke token
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
-        token.createdAt = (user as any).createdAt; // ✅ tambahkan ini
+        token.createdAt = (user as any).createdAt;
       }
       return token;
     },
 
     async session({ session, token }) {
-      // 🧩 Bawa data createdAt ke session.user agar bisa diakses di Header
+      // 🧩 Bawa data ke session.user agar bisa diakses di komponen
       if (token && session.user) {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
-        (session.user as any).createdAt = token.createdAt; // ✅ tambahkan ini
+        (session.user as any).createdAt = token.createdAt;
       }
       return session;
     },

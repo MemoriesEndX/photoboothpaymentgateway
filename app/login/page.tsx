@@ -27,10 +27,14 @@ export default function LoginPage() {
         return;
       }
 
+      // ✅ Gunakan callbackUrl untuk redirect setelah login
+      const searchParams = new URLSearchParams(window.location.search);
+      const callbackUrl = searchParams.get("callbackUrl") || "/";
+
       const response = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: false, // Kita handle redirect manual
       });
 
       // Jika ada error dari NextAuth
@@ -46,10 +50,21 @@ export default function LoginPage() {
         return;
       }
 
-      // Jika login berhasil
+      // ✅ Jika login berhasil
       if (response?.ok) {
-        router.push("/");
-        router.refresh();
+        // Wait sedikit untuk memastikan cookie sudah ter-set
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Redirect ke callbackUrl atau home
+        window.location.href = callbackUrl;
+        
+        // Loading akan otomatis berhenti karena halaman pindah
+        // Tapi tetap set false untuk safety
+        setLoading(false);
+      } else {
+        // Jika tidak ok dan tidak ada error, tampilkan error umum
+        setError("Login gagal. Silakan coba lagi.");
+        setLoading(false);
       }
     } catch (err) {
       console.error("Login error:", err);
