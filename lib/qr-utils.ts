@@ -47,8 +47,8 @@ export async function generateQrCodeBuffer(
   options: QrCodeOptions = {}
 ): Promise<Buffer> {
   try {
-    // Import QRCode hanya di server-side
-    const QRCode = require('qrcode');
+    // Dynamic import for server-side only
+    const QRCode = (await import('qrcode')).default;
     
     const mergedOptions = { ...DEFAULT_QR_OPTIONS, ...options };
     
@@ -83,7 +83,7 @@ export async function generateQrCodeDataUrl(
   options: QrCodeOptions = {}
 ): Promise<string> {
   try {
-    const QRCode = require('qrcode');
+    const QRCode = (await import('qrcode')).default;
     
     const mergedOptions = { ...DEFAULT_QR_OPTIONS, ...options };
     
@@ -98,9 +98,10 @@ export async function generateQrCodeDataUrl(
     });
     
     return dataUrl;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ QR Code data URL generation failed:', error);
-    throw new Error(`Failed to generate QR code data URL: ${error}`);
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to generate QR code data URL: ${message}`);
   }
 }
 
@@ -182,10 +183,11 @@ export async function safeGenerateQrCode(
       success: true,
       data: dataUrl,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error during QR code generation';
     return {
       success: false,
-      error: error?.message || 'Unknown error during QR code generation',
+      error: errorMessage,
     };
   }
 }

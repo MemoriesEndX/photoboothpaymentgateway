@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-function groupByDate(data: any[]) {
+type DateItem = { createdAt: Date };
+
+function groupByDate(data: DateItem[]) {
   const result: Record<string, number> = {};
 
   data.forEach((item) => {
@@ -31,8 +33,9 @@ export async function GET() {
         stripPhotoOriginal: groupByDate(strip),
       },
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error(e);
-    return NextResponse.json({ success: false, error: e.message }, { status: 500 });
+    const message = e instanceof Error ? e.message : 'Unknown error';
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

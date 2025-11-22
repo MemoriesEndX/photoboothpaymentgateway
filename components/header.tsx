@@ -1,5 +1,4 @@
 "use client";
-import { useLanguage } from "@/hooks/use-language";
 import LanguageSelector from "./language-selector";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +10,6 @@ import { Settings, LogOut } from "lucide-react";
 
 
 export default function Header() {
-  const { t } = useLanguage();
   const { data: session } = useSession();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);

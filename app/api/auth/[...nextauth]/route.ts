@@ -60,8 +60,10 @@ const handler = NextAuth({
       // Ini akan membuat middleware bisa langsung membaca role user
       try {
         const cookieStore = await cookies();
-        if (user?.email && (user as any).role) {
-          cookieStore.set("user_role", (user as any).role, { 
+        interface UserWithRole { role?: string; createdAt?: Date }
+        const userWithRole = user as UserWithRole;
+        if (user?.email && userWithRole.role) {
+          cookieStore.set("user_role", userWithRole.role, { 
             path: "/",
             httpOnly: false, // Biar bisa diakses client-side juga
             secure: process.env.NODE_ENV === "production",
@@ -85,9 +87,11 @@ const handler = NextAuth({
     async jwt({ token, user }) {
       // 🧩 Saat user login pertama kali, simpan data ke token
       if (user) {
+        interface UserWithRole { role?: string; createdAt?: Date }
+        const userWithRole = user as UserWithRole;
         token.id = user.id;
-        token.role = (user as any).role;
-        token.createdAt = (user as any).createdAt;
+        token.role = userWithRole.role;
+        token.createdAt = userWithRole.createdAt;
       }
       return token;
     },
@@ -95,9 +99,11 @@ const handler = NextAuth({
     async session({ session, token }) {
       // 🧩 Bawa data ke session.user agar bisa diakses di komponen
       if (token && session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
-        (session.user as any).createdAt = token.createdAt;
+        interface SessionUserExtended { id?: string; role?: string; createdAt?: Date }
+        const extendedUser = session.user as SessionUserExtended;
+        extendedUser.id = token.id as string;
+        extendedUser.role = token.role as string;
+        extendedUser.createdAt = token.createdAt as Date;
       }
       return session;
     },

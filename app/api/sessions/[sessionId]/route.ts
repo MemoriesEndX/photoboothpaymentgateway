@@ -3,11 +3,11 @@ import { prisma } from '@/lib/prisma';
 import type { PhotoWithType } from '@/types/photo';
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { sessionId } = params;
+    const { sessionId } = await params;
 
     if (!sessionId || sessionId.trim() === '') {
       return NextResponse.json(

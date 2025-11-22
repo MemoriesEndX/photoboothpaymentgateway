@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma"; //sesuaikan lokasi prisma client
-import { startOfDay, endOfDay } from "date-fns";
+import prisma from "@/lib/prisma";
 
-function groupByDate(data: any[]) {
+type DateItem = {
+  id: number;
+  createdAt: Date;
+};
+
+function groupByDate(data: DateItem[]) {
   const result: Record<string, number> = {};
 
   data.forEach((item) => {
@@ -20,15 +24,15 @@ export async function GET() {
   try {
     const [photo, singlePhoto, stripPhotoOriginal] = await Promise.all([
       prisma.photo.findMany({
-        select: { id: true, createdAt: true, category: true },
+        select: { id: true, createdAt: true },
         orderBy: { createdAt: "asc" },
       }),
       prisma.singlePhoto.findMany({
-        select: { id: true, createdAt: true, category: true },
+        select: { id: true, createdAt: true },
         orderBy: { createdAt: "asc" },
       }),
       prisma.stripPhotoOriginal.findMany({
-        select: { id: true, createdAt: true, category: true },
+        select: { id: true, createdAt: true },
         orderBy: { createdAt: "asc" },
       }),
     ]);
@@ -37,17 +41,14 @@ export async function GET() {
       photo: {
         total: photo.length,
         byDate: groupByDate(photo),
-        byCategory: groupByCategory(photo),
       },
       singlePhoto: {
         total: singlePhoto.length,
         byDate: groupByDate(singlePhoto),
-        byCategory: groupByCategory(singlePhoto),
       },
       stripPhotoOriginal: {
         total: stripPhotoOriginal.length,
         byDate: groupByDate(stripPhotoOriginal),
-        byCategory: groupByCategory(stripPhotoOriginal),
       },
     });
   } catch (error) {
@@ -57,18 +58,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
-
-function groupByCategory(data: any[]) {
-  const map: Record<string, number> = {};
-
-  data.forEach((item) => {
-    const cat = item.category || "Unknown";
-    map[cat] = (map[cat] || 0) + 1;
-  });
-
-  return Object.entries(map).map(([category, count]) => ({
-    category,
-    count,
-  }));
 }

@@ -359,17 +359,18 @@ export async function POST(req: NextRequest): Promise<NextResponse<SendQrRespons
       { status: 200 }
     );
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     // ========================================
     // GLOBAL ERROR HANDLER
     // ========================================
     console.error('❌ [send-qr] Unexpected error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
     
     return NextResponse.json(
       {
         success: false,
         message: 'Internal server error',
-        error: error?.message || 'An unexpected error occurred',
+        error: errorMessage,
       },
       { status: 500 }
     );

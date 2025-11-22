@@ -12,8 +12,10 @@ import {
 } from "recharts";
 import { Camera } from "lucide-react";
 
+type ChartDataPoint = { date: string; count: number };
+
 export default function SinglePhotoChart() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     fetch("/api/admin/photo-graphs")

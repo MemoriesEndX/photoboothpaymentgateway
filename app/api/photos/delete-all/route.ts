@@ -92,7 +92,9 @@ export async function DELETE() {
         } catch (err) {
           // Jika file tidak ada, anggap sukses karena tujuan bersihkan tetap tercapai
           const msg = getErrorMessage(err)
-          if (msg.includes('ENOENT') || (err as any)?.code === 'ENOENT') {
+          interface NodeError extends Error { code?: string }
+          const nodeError = err as NodeError;
+          if (msg.includes('ENOENT') || nodeError?.code === 'ENOENT') {
             fileDeleteResults.push({ id, table, url, filepath, ok: true, error: 'File tidak ditemukan (sudah terhapus)' })
           } else {
             fileDeleteResults.push({ id, table, url, filepath, ok: false, error: msg })

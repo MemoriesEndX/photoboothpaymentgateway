@@ -172,6 +172,7 @@ function PhotoCard({
           <DialogTitle className="text-lg font-semibold">Photo #{photo.id}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={photo.url}
             alt={`Photo ${photo.id}`}

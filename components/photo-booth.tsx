@@ -67,10 +67,6 @@ export default function PhotoBooth() {
    * This ensures session persists across page refreshes
    * Toast notification is shown only on new session creation
    */
-
-  interface QrGeneratorProps {
-  sessionId: string;
-}
   useEffect(() => {
     let currentSession = localStorage.getItem('sessionId');
 

@@ -38,9 +38,9 @@ interface User {
 }
 
 interface RouteContext {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // ==========================================
@@ -64,7 +64,7 @@ export async function GET(
   context: RouteContext
 ): Promise<NextResponse<ApiResponse>> {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     console.log(`🔍 [GET /api/admin/users/${id}] Fetching user...`);
 
     // Validate ID
@@ -141,7 +141,7 @@ export async function PUT(
   context: RouteContext
 ): Promise<NextResponse<ApiResponse>> {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     console.log(`✏️ [PUT /api/admin/users/${id}] Updating user...`);
 
     // Validate ID
@@ -327,7 +327,7 @@ export async function DELETE(
   context: RouteContext
 ): Promise<NextResponse<ApiResponse>> {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     console.log(`🗑️ [DELETE /api/admin/users/${id}] Deleting user...`);
 
     // Validate ID

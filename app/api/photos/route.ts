@@ -61,10 +61,40 @@ export async function GET(req: Request) {
     });
 
     // ✅ Combine all 3 tables into one array and tag each type
+    // Normalize URLs to ensure they're accessible
+    const normalizeUrl = (photo: { url?: string | null; storagePath?: string | null; filename?: string | null }) => {
+      // Prefer url field
+      if (photo.url) return photo.url;
+      // Fallback to storagePath
+      if (photo.storagePath) return photo.storagePath;
+      // Build from filename as last resort
+      if (photo.filename) {
+        // Check if filename already has path
+        if (photo.filename.startsWith('/')) return photo.filename;
+        return `/uploads/${photo.filename}`;
+      }
+      return null;
+    };
+
     const allPhotos = [
-      ...photos.map((p) => ({ ...p, type: 'photo' as const, timestamp: p.createdAt })),
-      ...singlePhotos.map((p) => ({ ...p, type: 'singlePhoto' as const, timestamp: p.createdAt })),
-      ...stripPhotoOriginals.map((p) => ({ ...p, type: 'stripPhotoOriginal' as const, timestamp: p.createdAt })),
+      ...photos.map((p) => ({ 
+        ...p, 
+        type: 'photo' as const, 
+        timestamp: p.createdAt,
+        url: normalizeUrl(p) || p.url,
+      })),
+      ...singlePhotos.map((p) => ({ 
+        ...p, 
+        type: 'singlePhoto' as const, 
+        timestamp: p.createdAt,
+        url: normalizeUrl(p) || p.url,
+      })),
+      ...stripPhotoOriginals.map((p) => ({ 
+        ...p, 
+        type: 'stripPhotoOriginal' as const, 
+        timestamp: p.createdAt,
+        url: normalizeUrl(p) || p.url,
+      })),
     ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
     console.log(

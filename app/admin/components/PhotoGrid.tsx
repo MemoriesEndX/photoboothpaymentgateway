@@ -10,7 +10,7 @@ type Photo = {
   filename: string;
   url: string;
   createdAt: string;
-  metadata?: any;
+  metadata?: Record<string, unknown> | null;
   type: 'photo' | 'singlePhoto' | 'stripPhotoOriginal';
 };
 

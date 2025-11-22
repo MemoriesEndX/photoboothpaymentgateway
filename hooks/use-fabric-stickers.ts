@@ -331,9 +331,11 @@ export function useFabricStickers() {
   const clearAllStickers = useCallback(() => {
     if (!fabricCanvasRef.current) return;
 
+    interface StickerObject { stickerId?: string }
     const objects = fabricCanvasRef.current.getObjects();
     objects.forEach((obj) => {
-      if ((obj as any).stickerId) {
+      const stickerObj = obj as StickerObject;
+      if (stickerObj.stickerId) {
         fabricCanvasRef.current!.remove(obj);
       }
     });
@@ -378,9 +380,11 @@ export function useFabricStickers() {
     const photoObj = objects.find((obj) => (obj as FabricImageWithName).name === 'photo-image');
 
     if (photoObj) {
-      // Get the current photo's original image
+      // Get the current photo's original image via safe property access
       const fabricImg = photoObj as FabricImage;
-      const imgElement = (fabricImg as any)._element;
+      // Access internal element safely via type assertion
+      type FabricImageInternal = { _element?: HTMLImageElement };
+      const imgElement = (fabricImg as unknown as FabricImageInternal)._element;
 
       if (imgElement && imgElement.src) {
         // Reload the photo with new sizing
@@ -397,18 +401,22 @@ export function useFabricStickers() {
       const canvas = fabricCanvasRef.current;
 
       // Remove existing background objects if any
+      interface NamedObject { name?: string }
       const objects = canvas.getObjects();
-      const existingBgObjects = objects.filter((obj) => 
-        (obj as any).name === 'background-rect' || 
-        (obj as any).name === 'background-pattern'
-      );
+      const existingBgObjects = objects.filter((obj) => {
+        const named = obj as NamedObject;
+        return named.name === 'background-rect' || named.name === 'background-pattern';
+      });
       existingBgObjects.forEach((obj) => canvas.remove(obj));
 
       if (background.type === 'color') {
         // For solid colors, use canvas backgroundColor
         canvas.backgroundColor = background.value;
         // Reset background to transparent for color backgrounds
-        const bgObjects = objects.filter((obj) => (obj as any).name === 'background-rect');
+        const bgObjects = objects.filter((obj) => {
+          const named = obj as NamedObject;
+          return named.name === 'background-rect';
+        });
         bgObjects.forEach((obj) => canvas.remove(obj));
       } else if (background.type === 'gradient') {
         // Reset canvas background to transparent for gradient backgrounds
@@ -476,20 +484,21 @@ export function useFabricStickers() {
             });
 
             // Add name property for identification
-            (gradientImg as any).name = 'background-rect';
+            interface NamedObject { name?: string; stickerId?: string }
+            (gradientImg as NamedObject).name = 'background-rect';
             canvas.add(gradientImg);
 
             // Send background to back and ensure proper layering
             canvas.sendObjectToBack(gradientImg);
 
             // Move photo image to middle layer
-            const photoObj = canvas.getObjects().find((obj) => (obj as any).name === 'photo-image');
+            const photoObj = canvas.getObjects().find((obj) => (obj as NamedObject).name === 'photo-image');
             if (photoObj) {
               canvas.bringObjectForward(photoObj);
             }
 
             // Ensure stickers remain on top
-            const stickerObjects = canvas.getObjects().filter((obj) => (obj as any).stickerId);
+            const stickerObjects = canvas.getObjects().filter((obj) => (obj as NamedObject).stickerId);
             stickerObjects.forEach((sticker) => {
               canvas.bringObjectToFront(sticker);
             });
@@ -561,20 +570,21 @@ export function useFabricStickers() {
             });
 
             // Add name property for identification
-            (patternImg as any).name = 'background-rect';
+            interface NamedObject { name?: string; stickerId?: string }
+            (patternImg as NamedObject).name = 'background-rect';
             canvas.add(patternImg);
 
             // Send background to back and ensure proper layering
             canvas.sendObjectToBack(patternImg);
 
             // Move photo image to middle layer
-            const photoObj = canvas.getObjects().find((obj) => (obj as any).name === 'photo-image');
+            const photoObj = canvas.getObjects().find((obj) => (obj as NamedObject).name === 'photo-image');
             if (photoObj) {
               canvas.bringObjectForward(photoObj);
             }
 
             // Ensure stickers remain on top
-            const stickerObjects = canvas.getObjects().filter((obj) => (obj as any).stickerId);
+            const stickerObjects = canvas.getObjects().filter((obj) => (obj as NamedObject).stickerId);
             stickerObjects.forEach((sticker) => {
               canvas.bringObjectToFront(sticker);
             });
@@ -606,8 +616,9 @@ export function useFabricStickers() {
       const canvas = fabricCanvasRef.current;
       
       // Remove existing frame objects if any
+      interface NamedObject { name?: string; stickerId?: string }
       const objects = canvas.getObjects();
-      const existingFrameObjects = objects.filter((obj) => (obj as any).name === 'frame-element');
+      const existingFrameObjects = objects.filter((obj) => (obj as NamedObject).name === 'frame-element');
       existingFrameObjects.forEach((obj) => canvas.remove(obj));
 
       setSelectedFrame(frame.id);
@@ -644,19 +655,20 @@ export function useFabricStickers() {
         });
 
         // Add name for identification
-        (frameImg as any).name = 'frame-element';
+        interface NamedObject { name?: string; stickerId?: string }
+        (frameImg as NamedObject).name = 'frame-element';
         
         canvas.add(frameImg);
 
         // Ensure frame is on top of background but below stickers
-        const photoObj = canvas.getObjects().find((obj) => (obj as any).name === 'photo-image');
+        const photoObj = canvas.getObjects().find((obj) => (obj as NamedObject).name === 'photo-image');
         if (photoObj) {
           canvas.bringObjectToFront(frameImg);
           canvas.bringObjectToFront(photoObj);
         }
 
         // Ensure stickers remain on top
-        const stickerObjects = canvas.getObjects().filter((obj) => (obj as any).stickerId);
+        const stickerObjects = canvas.getObjects().filter((obj) => (obj as NamedObject).stickerId);
         stickerObjects.forEach((sticker) => {
           canvas.bringObjectToFront(sticker);
         });

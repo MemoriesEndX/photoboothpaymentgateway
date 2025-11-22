@@ -9,6 +9,19 @@ import type { ToastActionElement, ToastProps } from "@/components/ui/toast"
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
+// UUID generation helper with fallback for environments without crypto.randomUUID
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  // Fallback UUID v4 implementation
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
@@ -119,7 +132,7 @@ function dispatch(action: Action) {
 type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
-  const id = crypto.randomUUID()
+  const id = generateUUID()
 
   const update = (props: Toast) =>
     dispatch({

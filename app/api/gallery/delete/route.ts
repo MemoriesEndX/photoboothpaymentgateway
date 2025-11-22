@@ -9,22 +9,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing id or type' }, { status: 400 });
     }
 
-    // mapping nama type ke model prisma
-    const modelMap = {
-      photo: prisma.Photo,
-      singlePhoto: prisma.SinglePhoto,
-      stripPhotoOriginal: prisma.StripPhotoOriginal,
-    } as const;
+    // Delete based on type
+    const photoId = Number(id);
 
-    const model = modelMap[type as keyof typeof modelMap];
-
-    if (!model) {
-      return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+    switch (type) {
+      case 'photo':
+        await prisma.photo.delete({ where: { id: photoId } });
+        break;
+      case 'singlePhoto':
+        await prisma.singlePhoto.delete({ where: { id: photoId } });
+        break;
+      case 'stripPhotoOriginal':
+        await prisma.stripPhotoOriginal.delete({ where: { id: photoId } });
+        break;
+      default:
+        return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }
-
-    await model.delete({
-      where: { id: Number(id) },
-    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

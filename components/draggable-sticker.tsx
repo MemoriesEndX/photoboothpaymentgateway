@@ -164,6 +164,7 @@ export default function DraggableSticker({
       onClick={() => isMobile && setShowControls(!showControls)}
       onKeyDown={handleKeyDown}
       onWheel={handleWheel}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src ?? '/placeholder.svg'}
         alt={name}

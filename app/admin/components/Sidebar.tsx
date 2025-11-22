@@ -11,8 +11,6 @@ import {
   Settings,
   Camera,
   Images,
-  FileText,
-  BarChart3,
   LogOut,
 } from "lucide-react";
 

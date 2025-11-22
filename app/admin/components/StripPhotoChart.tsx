@@ -12,8 +12,10 @@ import {
 } from "recharts";
 import { Film } from "lucide-react";
 
+type ChartDataPoint = { date: string; count: number };
+
 export default function StripPhotoChart() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     fetch("/api/admin/photo-graphs")

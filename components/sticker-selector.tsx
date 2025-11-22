@@ -123,6 +123,7 @@ export default function StickerSelector({ stickers, onSelectSticker }: StickerSe
                   className='sticker-item relative flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden cursor-pointer border-2 border-transparent hover:border-pink-300 hover:scale-105 transition-all duration-200 bg-white shadow-sm hover:shadow-md focus:outline-none focus:border-pink-400 active:scale-95'
                   onClick={() => onSelectSticker(sticker)}
                   title={sticker.name}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={sticker.src ?? '/placeholder.svg'}
                     alt={sticker.name}

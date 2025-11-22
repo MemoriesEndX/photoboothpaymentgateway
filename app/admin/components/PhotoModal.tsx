@@ -2,14 +2,13 @@
 'use client';
 
 import Image from 'next/image';
-import { Fragment } from 'react';
 
 type Photo = {
   id: number;
   filename: string;
   url: string;
   createdAt: string;
-  metadata?: any;
+  metadata?: Record<string, unknown> | null;
   type: string;
 } | null;
 

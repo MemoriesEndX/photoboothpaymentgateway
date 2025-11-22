@@ -45,8 +45,8 @@ export default function AdminPhotosPage() {
         setPhotos(data.photos || [])
         setSinglePhotos(data.singlePhotos || [])
         setStripPhotos(data.stripPhotoOriginals || [])
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load photos')
       } finally {
         setLoading(false)
       }
@@ -187,6 +187,7 @@ export default function AdminPhotosPage() {
                   <DialogTitle>{photo.filename}</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={photo.url} alt={photo.filename} className="max-h-[70vh] w-full object-contain rounded-lg border" />
                   <div className="flex gap-3 w-full">
                     <Button variant="outline" onClick={() => handleDownload(photo)} disabled={downloading === photo.id}>

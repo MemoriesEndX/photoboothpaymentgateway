@@ -267,6 +267,7 @@ const handleDeletePhoto = useCallback(async (photo: GalleryPhoto) => {
             <Dialog key={`${photo.type}-${photo.id}`}>
               <DialogTrigger asChild>
                 <div className='relative group cursor-pointer overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 aspect-square bg-gray-100'>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo.url}
                     alt={photo.filename}
@@ -297,6 +298,7 @@ const handleDeletePhoto = useCallback(async (photo: GalleryPhoto) => {
                   </DialogTitle>
                 </DialogHeader>
                 <div className='flex flex-col items-center gap-4'>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo.url}
                     alt={photo.filename}

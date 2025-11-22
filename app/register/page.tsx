@@ -49,7 +49,7 @@ export default function RegisterPage() {
         router.push("/");
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError("Terjadi kesalahan pada server");
     } finally {
       setLoading(false);

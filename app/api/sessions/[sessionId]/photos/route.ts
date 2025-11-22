@@ -2,8 +2,11 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function GET(req: Request, { params }: { params: { sessionId: string } }) {
-  const { sessionId } = params;
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  const { sessionId } = await params;
 
   if (!sessionId) {
     return NextResponse.json({ success: false, error: 'sessionId required' }, { status: 400 });

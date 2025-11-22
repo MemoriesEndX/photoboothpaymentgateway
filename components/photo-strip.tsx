@@ -152,6 +152,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
             {selectedTemplate === '1x1' ? (
               // Single photo layout
               <div className='w-full border border-gray-700 sm:border-2 aspect-square'>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photos[0] || '/placeholder.svg'}
                   alt='Captured moment'
@@ -163,6 +164,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
               <div className='flex flex-col gap-1 sm:gap-2 aspect-[1/3]'>
                 {photos.slice(0, 4).map((photo, index) => (
                   <div key={`photo-${index}`} className='flex-1 border border-gray-700 sm:border-2'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo || '/placeholder.svg'}
                       alt={`Moment ${index + 1}`}
@@ -176,6 +178,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
               <div className='flex flex-col gap-1 sm:gap-2 aspect-[1/2.25]'>
                 {photos.slice(0, 3).map((photo, index) => (
                   <div key={`photo-${index}`} className='flex-1 border border-gray-700 sm:border-2'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo || '/placeholder.svg'}
                       alt={`Moment ${index + 1}`}
@@ -191,6 +194,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
                   <div
                     key={`photo-${index}`}
                     className='border border-gray-700 sm:border-2 aspect-square'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo || '/placeholder.svg'}
                       alt={`Moment ${index + 1}`}
@@ -206,6 +210,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
                   <div
                     key={`photo-${index}`}
                     className='border border-gray-700 sm:border-2 aspect-square'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo || '/placeholder.svg'}
                       alt={`Moment ${index + 1}`}
@@ -220,6 +225,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
                 {/* Top row - single photo centered */}
                 <div className='flex justify-center flex-1'>
                   <div className='w-1/2 border border-gray-700 sm:border-2 aspect-square'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photos[0] || '/placeholder.svg'}
                       alt='Moment 1'
@@ -233,6 +239,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
                     <div
                       key={`photo-${index + 1}`}
                       className='border border-gray-700 sm:border-2 aspect-square'>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={photo || '/placeholder.svg'}
                         alt={`Moment ${index + 2}`}
@@ -247,6 +254,7 @@ export default function PhotoStrip({ photos, selectedTemplate = '4x1' }: PhotoSt
               <div className='flex flex-col gap-1 sm:gap-2'>
                 {photos.map((photo, index) => (
                   <div key={`photo-${index}`} className='w-full border border-gray-700 sm:border-2'>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo || '/placeholder.svg'}
                       alt={`Moment ${index + 1}`}
