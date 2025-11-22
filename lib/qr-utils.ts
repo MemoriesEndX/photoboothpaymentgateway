@@ -129,7 +129,7 @@ export function isValidUrl(url: string): boolean {
  */
 export function buildGalleryUrl(sessionId: string, baseUrl?: string): string {
   const base = baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
-  return `${base}/gallery/${sessionId}`;
+  return `${base}/sharing/${sessionId}`;
 }
 
 /**

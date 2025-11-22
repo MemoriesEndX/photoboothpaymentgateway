@@ -28,7 +28,7 @@ interface Photo {
   createdAt: string | Date;
 }
 
-export default function GalleryPage() {
+export default function SharingPage() {
   const params = useParams();
   const sessionId = typeof params?.sessionId === 'string' ? params.sessionId : String(params?.sessionId || '');
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -47,7 +47,7 @@ export default function GalleryPage() {
     if (photo.filename) {
       // Check if filename already has path prefix
       if (photo.filename.startsWith('/')) return photo.filename;
-      // Default to /uploads/ or /gallery/ based on your setup
+      // Default to /uploads/ based on your setup
       return `/uploads/${photo.filename}`;
     }
     // Ultimate fallback to placeholder

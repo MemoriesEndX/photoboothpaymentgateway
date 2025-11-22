@@ -101,13 +101,13 @@ async function generateQrCodeBuffer(url: string): Promise<Buffer> {
 function buildGalleryUrl(req: NextRequest, sessionId: string): string {
   // Priority: ENV variable > Dynamic from request headers
   if (BASE_URL) {
-    return `${BASE_URL}/gallery/${sessionId}`;
+    return `${BASE_URL}/sharing/${sessionId}`;
   }
 
   // Fallback: construct from request headers
   const protocol = req.headers.get('x-forwarded-proto') || 'https';
   const host = req.headers.get('host') || 'localhost:3000';
-  return `${protocol}://${host}/gallery/${sessionId}`;
+  return `${protocol}://${host}/sharing/${sessionId}`;
 }
 
 /**

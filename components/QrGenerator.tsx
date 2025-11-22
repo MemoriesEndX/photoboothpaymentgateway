@@ -27,7 +27,7 @@ export default function QrGenerator({ sessionId }: QrGeneratorProps) {
   useEffect(() => {
     if (sessionId) {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
-      const url = `${baseUrl}/gallery/${sessionId}`;
+      const url = `${baseUrl}/sharing/${sessionId}`;
       setGalleryUrl(url);
     }
   }, [sessionId]);
