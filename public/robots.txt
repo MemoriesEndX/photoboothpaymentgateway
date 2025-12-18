@@ -1,19 +1,28 @@
+# Robots.txt for Photobooth Application
+# Domain: https://photobooth-memoriesendxyz.online
+
 User-agent: *
+
+# Allow public pages
 Allow: /
-
-# Sitemap location
-Sitemap: https://photobooth.tedyfazrin.com/sitemap.xml
-
-# Crawl delay (optional)
-Crawl-delay: 1
-
-# Block access to admin or private areas (if any)
-Disallow: /api/
-Disallow: /_next/
-Disallow: /admin/
-
-# Allow access to important pages
-Allow: /
+Allow: /demo
 Allow: /privacy
 Allow: /terms
 Allow: /support
+
+# Disallow private and authentication routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /sharing/
+
+# Disallow Next.js internals
+Disallow: /_next/
+Disallow: /static/
+
+# Sitemap location
+Sitemap: https://photobooth-memoriesendxyz.online/sitemap.xml
+
+# Crawl delay to reduce server load
+Crawl-delay: 1

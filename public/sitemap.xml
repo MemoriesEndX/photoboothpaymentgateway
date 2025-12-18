@@ -4,37 +4,45 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://photobooth.tedyfazrin.com/</loc>
-    <lastmod>2025-06-13</lastmod>
+    <loc>https://photobooth-memoriesendxyz.online/</loc>
+    <lastmod>2025-12-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://photobooth.tedyfazrin.com/"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://photobooth.tedyfazrin.com/es"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://photobooth.tedyfazrin.com/fr"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://photobooth.tedyfazrin.com/de"/>
-    <xhtml:link rel="alternate" hreflang="pt" href="https://photobooth.tedyfazrin.com/pt"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://photobooth-memoriesendxyz.online/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://photobooth-memoriesendxyz.online/es"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://photobooth-memoriesendxyz.online/fr"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://photobooth-memoriesendxyz.online/de"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://photobooth-memoriesendxyz.online/pt"/>
+  </url>
+  
+  <!-- Demo Page -->
+  <url>
+    <loc>https://photobooth-memoriesendxyz.online/demo</loc>
+    <lastmod>2025-12-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   
   <!-- Privacy Policy -->
   <url>
-    <loc>https://photobooth.tedyfazrin.com/privacy</loc>
-    <lastmod>2025-06-13</lastmod>
+    <loc>https://photobooth-memoriesendxyz.online/privacy</loc>
+    <lastmod>2025-12-18</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   
   <!-- Terms of Service -->
   <url>
-    <loc>https://photobooth.tedyfazrin.com/terms</loc>
-    <lastmod>2025-06-13</lastmod>
+    <loc>https://photobooth-memoriesendxyz.online/terms</loc>
+    <lastmod>2025-12-18</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   
   <!-- Support -->
   <url>
-    <loc>https://photobooth.tedyfazrin.com/support</loc>
-    <lastmod>2025-06-13</lastmod>
+    <loc>https://photobooth-memoriesendxyz.online/support</loc>
+    <lastmod>2025-12-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
