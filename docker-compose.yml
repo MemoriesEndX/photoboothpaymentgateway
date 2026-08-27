@@ -1,0 +1,64 @@
+name: photobooth
+
+services:
+  app:
+    container_name: photobooth-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: photobooth-app:latest
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-photobooth}:${POSTGRES_PASSWORD:-photobooth_secure_password}@db:5432/${POSTGRES_DB:-photobooth_db}?schema=public
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3001}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-default_secret_key_minimum_32_chars_photobooth}
+      - JWT_SECRET=${JWT_SECRET:-default_jwt_secret_photobooth}
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3001}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - SUPPORT_EMAIL=${SUPPORT_EMAIL:-}
+      - FROM_EMAIL=${FROM_EMAIL:-}
+      - STORAGE_MODE=${STORAGE_MODE:-local}
+    ports:
+      - "${APP_PORT:-3001}:3000"
+    volumes:
+      - ./public/uploads:/app/public/uploads
+      - ./public/gallery:/app/public/gallery
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - photobooth-network
+
+  db:
+    container_name: photobooth-postgres
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-photobooth}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-photobooth_secure_password}
+      POSTGRES_DB: ${POSTGRES_DB:-photobooth_db}
+    volumes:
+      - photobooth-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-photobooth} -d $${POSTGRES_DB:-photobooth_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - photobooth-network
+
+networks:
+  photobooth-network:
+    name: photobooth-network
+    driver: bridge
+
+volumes:
+  photobooth-postgres-data:
+    name: photobooth-postgres-data

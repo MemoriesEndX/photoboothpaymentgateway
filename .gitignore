@@ -18,6 +18,7 @@ yarn-error.log*
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -26,10 +27,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# package-lock.json
-package-lock.json
-# pnpm
+# package locks (keep package-lock.json for npm ci reproducibility)
 pnpm-lock.yaml
-# yarn
 yarn.lock
 /lib/generated/prisma
+

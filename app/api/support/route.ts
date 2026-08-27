@@ -1,13 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Ambil Kunci API dari environment variables
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Ambil alamat email tujuan dan pengirim sesuai dengan .env.local Anda
-const CONTACT_EMAIL = process.env.SUPPORT_EMAIL; 
-const SENDER_EMAIL = process.env.FROM_EMAIL; 
-
+// Interface untuk data form
 interface FormData {
   name: string;
   email: string;
@@ -19,17 +13,24 @@ interface FormData {
  * Handler untuk permintaan POST ke /api/support
  */
 export async function POST(request: Request) {
+  // Ambil environment variables saat runtime request
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  const CONTACT_EMAIL = process.env.SUPPORT_EMAIL; 
+  const SENDER_EMAIL = process.env.FROM_EMAIL; 
+
   // Verifikasi konfigurasi dasar
-  if (!CONTACT_EMAIL || !SENDER_EMAIL) {
-    console.error('Environment variables SUPPORT_EMAIL or FROM_EMAIL are not set correctly.');
+  if (!RESEND_API_KEY || !CONTACT_EMAIL || !SENDER_EMAIL) {
+    console.error('Environment variables RESEND_API_KEY, SUPPORT_EMAIL, or FROM_EMAIL are not set correctly.');
     return NextResponse.json(
       { 
         success: false, 
-        error: 'Server configuration error: Contact or Sender email not set.' 
+        error: 'Server configuration error: Contact or Sender email not configured.' 
       },
       { status: 500 }
     );
   }
+
+  const resend = new Resend(RESEND_API_KEY);
 
   try {
     const data: FormData = await request.json();
