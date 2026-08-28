@@ -60,8 +60,8 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     PORT=3000
 
-# Copy node_modules and build artifacts
-COPY --from=deps /app/node_modules ./node_modules
+# Copy node_modules (including generated Prisma client) and build artifacts
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma

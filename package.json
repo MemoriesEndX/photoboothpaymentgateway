@@ -34,6 +34,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
+    "test": "node --test tests/**/*.test.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "rm -rf .next out dist",
@@ -112,5 +113,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   }
 }
