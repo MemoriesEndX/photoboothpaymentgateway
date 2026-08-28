@@ -1,6 +1,5 @@
 import type React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
@@ -9,9 +8,6 @@ import { LanguageProvider } from '@/hooks/use-language';
 import NextAuthSessionProvider from '@/components/session-provider';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
-
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
@@ -188,7 +184,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className='font-sans antialiased'>
         <ThemeProvider
           attribute='class'
           defaultTheme='light'
